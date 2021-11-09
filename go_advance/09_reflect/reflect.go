@@ -42,28 +42,14 @@ func getRun2(x interface{}){
 	fmt.Println("类型名称",v.Name())
 	fmt.Println("类型种类",v.Kind())
 
-}
-
-
-type Student struct {
-	Name string `json:"name"`
-	Age int `json:"age"`
-}
-
-func (s Student) GetInfo() string{
-	str:=fmt.Sprint("姓名：%v,年龄:%v",s.Name,s.Age)
-	return str
-}
-
-func (s *Student)SetInfo(name string,age int)  {
-	s.Name=name
-	s.Age=age
-}
-
-func getStructRun(x interface{}){
-
+	// 5.value.Kind()
+	kind:=reflect.ValueOf(x).Kind()
+	fmt.Println("value kind:",kind)
 
 }
+
+
+
 
 func main() {
 

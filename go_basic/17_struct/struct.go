@@ -60,9 +60,12 @@ func main() {
 	fmt.Printf("%#v\n", p5)
 
 	fmt.Println("-----------实例化方式六--------")
+	// 这里要完全赋值
 	var p6 = person{
-		name: "陈其",
-		age:  10,
+		 "陈其",
+		  10,
+		  "male",
+		[]string{"chifan","shuijiao","shangban"},
 	}
 	fmt.Printf("%#v\n", p6)
 

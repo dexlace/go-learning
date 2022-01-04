@@ -1,8 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+	"reflect"
+)
 
-func main()  {
+func main() {
 	// 切片是引用数据类型
 	// 所以牵一发动全身
 	var enum = []int{100, 200, 300}
@@ -85,5 +89,22 @@ func main()  {
 	sli6 := []int{0, 1, 2, 3, 4, 5}
 	sli6 = append(sli6[:1], sli6[3:]...)
 	fmt.Println(sli6)
+
+	fmt.Printf("\n/********************第89行 切片比较****************/\n")
+	aaaaa := []byte{0, 1, 3, 2}
+
+	bbbbb := []byte{0, 1, 3, 2}
+
+	ccccc := []byte{1, 1, 3, 2}
+
+	// 只适用于byte
+	fmt.Println(bytes.Equal(aaaaa, bbbbb))
+
+	fmt.Println(bytes.Equal(aaaaa, ccccc))
+
+	// 用反射比较会比较通用
+	fmt.Println(reflect.DeepEqual(aaaaa, bbbbb))
+
+	fmt.Println(reflect.DeepEqual(aaaaa, ccccc))
 
 }

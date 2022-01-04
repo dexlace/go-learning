@@ -20,17 +20,17 @@ import "strings"
 
 // 用sep分割s
 
-func Split(target,sep string) (result [] string){
+func Split(target, sep string) (result []string) {
 	// 返回sep在target中第一次出现的位置
-	i:=strings.Index(target,sep)
+	i := strings.Index(target, sep)
 
-	for i>-1{
+	for i > -1 {
 		// 给切片扩容操作 难道忘了？
-		result=append(result,target[:i])
-		// 这是go字符串的截取操作，从第i+1个位置到最后一个位置  卧槽 我又忘了
-		target=target[i+1:]
+		result = append(result, target[:i])
+		// 这是go字符串的截取操作，但是截取的是从i+len(sep)后开始的
+		target = target[i+len(sep):]
 		// 然后求在下一段出现的位置  然后继续分割
-		i=strings.Index(target,sep)
+		i = strings.Index(target, sep)
 
 	}
 

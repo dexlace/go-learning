@@ -237,7 +237,7 @@ Go1.5版本之后开始支持，能够控制Go语言程序编译时依赖包==�
 
 1. `GO111MODULE=off`禁用模块支持，编译时会从`GOPATH`和`vendor`文件夹中查找包。
 2. `GO111MODULE=on`启用模块支持，编译时会忽略`GOPATH`和`vendor`文件夹，只根据 `go.mod`下载依赖。
-3. `GO111MODULE=auto`，当项目在`$GOPATH/src`外且项目根目录有`go.mod`文件时，开启模块支持。
+3. `GO111MODULE=auto`，==当项目在`$GOPATH/src`外且项目根目录有`go.mod`文件时，开启模块支持。==
 
 ==简单来说，设置`GO111MODULE=on`之后就可以使用`go module`了，以后就没有必要在GOPATH中创建项目了，并且还能够很好的管理项目依赖的第三方包信息。==
 
@@ -251,7 +251,7 @@ Go1.11之后设置GOPROXY命令为：
 export GOPROXY=https://goproxy.cn
 ```
 
-Go1.13之后`GOPROXY`默认值为`https://proxy.golang.org`，在国内是无法访问的，所以十分建议大家设置GOPROXY，这里我推荐使用[goproxy.cn](https://studygolang.com/topics/10014)。
+Go1.13之后`GOPROXY`默认值为`https://proxy.golang.org`，在国内是无法访问的，所以十分建议大家设置GOPROXY，==这里我推荐使用[goproxy.cn](https://studygolang.com/topics/10014)。==
 
 ```bash
 go env -w GOPROXY=https://goproxy.cn,direct
@@ -321,7 +321,7 @@ replace (
 )
 ```
 
-### **go get**
+### go get
 
 在项目中执行`go get`命令可以下载依赖包，并且还可以指定下载的版本。
 
@@ -331,9 +331,11 @@ replace (
 
 如果下载所有依赖可以使用`go mod download`命令。
 
+`go get` 以后我发现下载的包不在`src`目录下生成,而==全部到了`$GOPATH$/pkg`目录下==
+
 ### 整理依赖
 
-我们在代码中删除依赖代码后，相关的依赖库并不会在`go.mod`文件中自动移除。这种情况下我们可以使用`go mod tidy`命令更新`go.mod`中的依赖关系。
+我们在代码中删除依赖代码后，相关的依赖库并不会在`go.mod`文件中自动移除。这种情况下我们可以使用==`go mod tidy`命令更新`go.mod`中的依赖关系。==
 
 ### go mod edit
 

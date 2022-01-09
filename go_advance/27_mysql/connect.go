@@ -155,6 +155,136 @@ func deleteRowDemo() {
 	}
 	fmt.Printf("delete success, affected rows:%d\n", n)
 }
+
+// 8. mysql预处理
+// ### 什么是预处理？
+//
+//普通SQL语句执行过程：
+//
+//1. 客户端对SQL语句进行占位符替换得到完整的SQL语句。
+//2. 客户端发送完整SQL语句到MySQL服务端
+//3. MySQL服务端执行完整的SQL语句并将结果返回给客户端。
+//
+//预处理执行过程：
+//
+//1. 把SQL语句分成两部分，命令部分与数据部分。
+//2. 先把命令部分发送给MySQL服务端，MySQL服务端进行SQL预处理。
+//3. 然后把数据部分发送给MySQL服务端，MySQL服务端对SQL语句进行占位符替换。
+//4. MySQL服务端执行完整的SQL语句并将结果返回给客户端。
+//
+//### 为什么要预处理？
+//
+//1. 优化MySQL服务器重复执行SQL的方法，可以提升服务器性能，提前让服务器编译，一次编译多次执行，节省后续编译的成本。
+//2. 避免SQL注入问题。
+// 预处理查询示例
+func prepareQueryDemo() {
+	// 8.1 准备sql
+	sqlStr := "select id, name, age from user where id > ?"
+	// 8.2 预处理
+	stmt, err := db.Prepare(sqlStr)
+	if err != nil {
+		fmt.Printf("prepare failed, err:%v\n", err)
+		return
+	}
+	defer stmt.Close()
+	// 8.3 执行sql
+	rows, err := stmt.Query(0)
+	if err != nil {
+		fmt.Printf("query failed, err:%v\n", err)
+		return
+	}
+	defer rows.Close()
+	// 8.4 循环读取结果集中的数据
+	for rows.Next() {
+		var u user
+		err := rows.Scan(&u.id, &u.name, &u.age)
+		if err != nil {
+			fmt.Printf("scan failed, err:%v\n", err)
+			return
+		}
+		fmt.Printf("id:%d name:%s age:%d\n", u.id, u.name, u.age)
+	}
+}
+
+// 9. sql注入
+// sql注入示例
+func sqlInjectDemo(name string) {
+	sqlStr := fmt.Sprintf("select id, name, age from user where name='%s'", name)
+	fmt.Printf("SQL:%s\n", sqlStr)
+
+	rows, err := db.Query(sqlStr)
+	if err != nil {
+		fmt.Printf("exec failed, err:%v\n", err)
+		return
+	}
+
+	for rows.Next() {
+		var u user
+		err := rows.Scan(&u.id, &u.name, &u.age)
+		if err != nil {
+			fmt.Printf("scan failed, err:%v\n", err)
+			return
+		}
+		fmt.Printf("id:%d name:%s age:%d\n", u.id, u.name, u.age)
+	}
+
+}
+
+// 10.事物
+// 事务操作示例
+func transactionDemo() {
+	// 10.1 开启事务
+	tx, err := db.Begin() // 开启事务
+	if err != nil {
+		if tx != nil {
+			tx.Rollback() // 回滚
+		}
+		fmt.Printf("begin trans failed, err:%v\n", err)
+		return
+	}
+	sqlStr1 := "Update user set age=30 where id=?"
+	// 10.2 执行sql
+	ret1, err := tx.Exec(sqlStr1, 2)
+	if err != nil {
+		tx.Rollback() // 回滚
+		fmt.Printf("exec sql1 failed, err:%v\n", err)
+		return
+	}
+	affRow1, err := ret1.RowsAffected()
+	if err != nil {
+		tx.Rollback() // 回滚
+		fmt.Printf("exec ret1.RowsAffected() failed, err:%v\n", err)
+		return
+	}
+
+	sqlStr2 := "Update user set age=40 where id=?"
+	ret2, err := tx.Exec(sqlStr2, 3)
+	if err != nil {
+		tx.Rollback() // 回滚
+		fmt.Printf("exec sql2 failed, err:%v\n", err)
+		return
+	}
+	affRow2, err := ret2.RowsAffected()
+	if err != nil {
+		tx.Rollback() // 回滚
+		fmt.Printf("exec ret1.RowsAffected() failed, err:%v\n", err)
+		return
+	}
+
+	fmt.Println(affRow1, affRow2)
+
+	// 3. 提交事务
+	if affRow1 == 1 && affRow2 == 1 {
+		fmt.Println("事务提交啦...")
+		tx.Commit() // 提交事务
+	} else {
+		tx.Rollback()
+		fmt.Println("事务回滚啦...")
+	}
+
+	fmt.Println("exec trans success!")
+}
+
 func main() {
 	err := initDB()
 	if err != nil {
@@ -169,6 +299,12 @@ func main() {
 
 	//updateRowDemo()
 
-	deleteRowDemo()
+	//deleteRowDemo()
 
+	//prepareQueryDemo()
+
+	// #"表示
+	// select id, name, age from user where name='xxx' or 1=1 #'
+	// 纯粹是字符串连接  然后#'是注释了后面多余的'
+	sqlInjectDemo("xxx' or 1=1 #")
 }
